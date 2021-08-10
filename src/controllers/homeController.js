@@ -1,16 +1,25 @@
-const { unitScheme } = require('../models/location');
-const mongoose = require('mongoose');
-
+//const { google } = require('googleapis');
+const axios = require('axios');
+const Unit = require('../models/unit');
 class homeController {
-  async add(req, res, next) {
+  async getDataSheet(req, res) {
     try {
-      // const { name, className, needCrew, cost} = req.body
-      // const Unit = mongoose.model('Unit', unitScheme);
-      //TODO
-    } catch (error) {}
+
+    } catch (e) {
+
+    }
   }
 
-  async getAll(req, res) {}
+  async getAll(req, res) {
+    const products = await Unit.find();
+
+    if (!products.length) {
+      res.status(404).json({
+        message: 'Not found any products'
+      })
+    }
+    res.status(200).json(products);
+  }
 }
 
 module.exports = new homeController();
