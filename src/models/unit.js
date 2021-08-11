@@ -5,16 +5,11 @@ const unitSchema = new mongoose.Schema({
   className: String,
   weapon: String,
   ammo: String,
-  imageUrl: String,
-  isCrew: Boolean,
-  crewCount: Number,
+  isCrew: String,
+  crewCount: String,
   price: { type: Number, required: true },
   side: String,
-  category: {
-    type: mongoose.Types.ObjectId,
-    required: true,
-    ref: 'Category',
-  }
+  category: String,
 });
 
 module.exports = mongoose.model('Unit', unitSchema);

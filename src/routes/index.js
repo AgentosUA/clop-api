@@ -1,9 +1,8 @@
 const router = require('express').Router();
-const home = require('./home.js');
-const second = require('./second.js');
+const sheetRoute = require('./sheet.js');
+const shopRoute = require('./shop.js');
 
-router.use(home);
-router.use(second);
-
+router.use(sheetRoute);
+router.use(shopRoute);
 
 module.exports = router;
