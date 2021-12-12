@@ -36,7 +36,7 @@ exports.setTable = async (req, res) => {
           weapon: side.getCell(i, 2).value,
           ammo: side.getCell(i, 3).value,
           comment: side.getCell(i, 4).value || '',
-          isCrew: side.getCell(i, 5).value || false,
+          isCrew: Boolean(side.getCell(i, 5).value === 'X'),
           crewCount: side.getCell(i, 6).value,
           price: isNaN(Number(side.getCell(i, 7).value))
             ? 1
@@ -49,13 +49,14 @@ exports.setTable = async (req, res) => {
       return [units, categories];
     };
 
+    await Unit.deleteMany({});
+    await Category.deleteMany({});
+
     const [usUnits, usCategories] = await getUnitsData(US, 'US');
     const [rfUnits, rfCategories] = await getUnitsData(RF, 'RF');
 
-    await Unit.deleteMany({});
     await Unit.insertMany([...rfUnits, ...usUnits]);
 
-    await Category.deleteMany({});
     await Category.insertMany(
       usCategories.map((category) => {
         return {
