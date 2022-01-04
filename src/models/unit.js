@@ -11,6 +11,7 @@ const unitSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   side: String,
   category: String,
+  clopType: { type: String, required: true },
 });
 
 module.exports = mongoose.model('Unit', unitSchema);
