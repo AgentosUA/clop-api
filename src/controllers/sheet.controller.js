@@ -2,12 +2,16 @@ const { GoogleSpreadsheet } = require('google-spreadsheet');
 const creds = require('../../config/client_secret.json');
 const { Unit, Category } = require('../models');
 
+const getDefaultTableId = (clopType) => {
+  if (clopType === 'heavy') return '1KfrDPs1aCkgWuw0VjbL5IOAgfLJlYZCHTMmppA6cJ7I';
+  if (clopType === 'light') return '1iwW59fJ5FTGkfxZElDDDUv7af1M0Cyl6UCm0wIZbxGc';
+};
+
 exports.setTable = async (req, res) => {
   try {
-    const { tableId } = req.query;
-    const doc = new GoogleSpreadsheet(
-      tableId || '1KfrDPs1aCkgWuw0VjbL5IOAgfLJlYZCHTMmppA6cJ7I'
-    );
+    const { tableId, clopType = 'heavy' } = req.query;
+
+    const doc = new GoogleSpreadsheet(tableId || getDefaultTableId(clopType));
     await doc.useServiceAccountAuth(creds);
     await doc.loadInfo();
 
@@ -43,14 +47,15 @@ exports.setTable = async (req, res) => {
             : Number(side.getCell(i, 7).value),
           side: sideName,
           category: currentCategory,
+          clopType,
         });
       }
 
       return [units, categories];
     };
 
-    await Unit.deleteMany({});
-    await Category.deleteMany({});
+    await Unit.deleteMany({ clopType });
+    await Category.deleteMany({ clopType });
 
     const [usUnits, usCategories] = await getUnitsData(US, 'US');
     const [rfUnits, rfCategories] = await getUnitsData(RF, 'RF');
@@ -61,12 +66,13 @@ exports.setTable = async (req, res) => {
       usCategories.map((category) => {
         return {
           name: category,
+          clopType,
         };
       })
     );
 
     res.status(200).json({
-      message: 'Table sucessfully updated',
+      message: 'Table successfully updated',
       US_ARMY: {
         units: usUnits,
         categories: usCategories,
@@ -78,6 +84,8 @@ exports.setTable = async (req, res) => {
     });
   } catch (error) {
     console.log(error);
-    res.status(500).json('Failed to update:', error);
+    res.status(500).json({
+      error: `Failed to update: ${error?.message}`,
+    });
   }
 };
